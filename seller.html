@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PaceHold | Seller</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(180deg, #f5f8ff 0%, #e8f0ff 100%);
+      color: #1a1f36;
+      margin: 0;
+      text-align: center;
+    }
+    header {
+      background: #155fc0;
+      color: #fff;
+      padding: 1.5rem 1rem;
+      border-bottom-left-radius: 2rem;
+      border-bottom-right-radius: 2rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin: 0;
+    }
+    p {
+      color: #e0e7ff;
+      margin: 0.5rem 0 1rem;
+    }
+    .content {
+      padding: 2rem 1rem;
+    }
+    .card {
+      background: #fff;
+      margin: 1rem auto;
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      max-width: 350px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    }
+    button {
+      background: #155fc0;
+      color: #fff;
+      border: none;
+      border-radius: 1.5rem;
+      padding: 1rem 2.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      background: #0e4e9b;
+      transform: scale(1.03);
+    }
+    #status {
+      font-weight: 600;
+      margin-top: 1rem;
+    }
+    .back {
+      margin-top: 2rem;
+      display: inline-block;
+      color: #155fc0;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Seller Dashboard</h1>
+    <p>View your transaction and receive payments</p>
+  </header>
+
+  <div class="content">
+    <div class="card">
+      <h3>Order: #1245</h3>
+      <p>Item: Wireless Earbuds</p>
+      <p>Buyer: John Doe</p>
+      <button onclick="confirmDelivery()">Confirm Delivery</button>
+      <p id="status">Status: Waiting for Buyer</p>
+    </div>
+
+    <a href="index.html" class="back">← Back to Home</a>
+  </div>
+
+  <script>
+    function confirmDelivery() {
+      const status = document.getElementById('status');
+      status.textContent = "Status: Delivery Confirmed 🚚";
+      setTimeout(() => {
+        status.textContent = "Status: Payment Released ✅";
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
