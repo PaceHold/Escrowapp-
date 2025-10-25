@@ -68,13 +68,14 @@
     <h1>PaceHold</h1>
     <p>Secure Escrow Payments for Buyers, Sellers, and Riders</p>
   </header>
-
-  <div class="btn-container">
-    <button class="btn" onclick="navigateTo('buyer.html')">Buyer</button>
-    <button class="btn" onclick="navigateTo('seller.html')">Seller</button>
-    <button class="btn" onclick="navigateTo('rider.html')">Rider</button>
-  </div>
-
+  
+<div class="actions">
+  <button onclick="createTransaction('John (Buyer)', 'Amina (Seller)', 30000, 'Shoes')">Lock ₦30,000 Escrow</button>
+  <button onclick="showTransaction()">View Transaction</button>
+  <button onclick="releaseFunds()">Release Funds</button>
+  <a href='seller.html' class='link'>Go to Seller Page →</a>
+</div>
+  
   <footer>© 2025 PaceHold. All rights reserved.</footer>
 
   <script>
