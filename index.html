@@ -3,128 +3,87 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PaceHold | Secure Payments and Deliveries</title>
+  <title>PaceHold</title>
   <style>
-    * {
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(180deg, #f5f8ff 0%, #e8f0ff 100%);
+      color: #1a1f36;
+      text-align: center;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-      font-family: "Poppins", sans-serif;
     }
-
-    body {
-      background-color: #f9fafc;
-      color: #1e293b;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
     header {
-      background-color: #0f172a;
+      background: #1a73e8;
       color: #fff;
-      text-align: center;
-      padding: 1.5rem;
+      padding: 2rem 1rem;
+      border-bottom-left-radius: 2rem;
+      border-bottom-right-radius: 2rem;
     }
-
-    header h1 {
-      font-size: 1.6rem;
-      font-weight: 600;
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
     }
-
-    header p {
-      font-size: 0.95rem;
-      opacity: 0.9;
-      margin-top: 4px;
+    p {
+      color: #e0e7ff;
     }
-
-    main {
-      flex: 1;
-      padding: 2rem 1.5rem;
-      max-width: 500px;
-      margin: auto;
-      text-align: center;
-    }
-
-    .buttons {
+    .btn-container {
+      margin: 3rem 0;
       display: flex;
       flex-direction: column;
+      align-items: center;
       gap: 1rem;
-      margin-top: 2rem;
     }
-
     .btn {
-      background-color: #2563eb;
-      color: white;
-      padding: 0.9rem;
+      background: #1a73e8;
+      color: #fff;
       border: none;
-      border-radius: 10px;
+      border-radius: 1.5rem;
+      padding: 1rem 2.5rem;
+      width: 80%;
+      max-width: 300px;
       font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: 0.3s ease;
+      transition: all 0.3s ease;
     }
-
     .btn:hover {
-      background-color: #1d4ed8;
+      background: #155fc0;
+      transform: scale(1.03);
     }
-
-    .btn-outline {
-      background-color: white;
-      color: #2563eb;
-      border: 2px solid #2563eb;
-    }
-
-    .btn-outline:hover {
-      background-color: #2563eb;
-      color: white;
-    }
-
     footer {
-      text-align: center;
-      font-size: 0.85rem;
-      color: #64748b;
+      margin-top: 4rem;
       padding: 1rem;
-      background-color: #f1f5f9;
-      border-top: 1px solid #e2e8f0;
+      color: #555;
+      font-size: 0.9rem;
     }
-
-    @media (max-width: 480px) {
-      header h1 {
-        font-size: 1.3rem;
-      }
-      .btn {
-        font-size: 0.95rem;
-      }
+    .fade {
+      opacity: 0;
+      transition: opacity 0.5s ease;
     }
   </style>
 </head>
-
 <body>
   <header>
     <h1>PaceHold</h1>
-    <p>Secure Payments. Trusted Deliveries.</p>
+    <p>Secure Escrow Payments for Buyers, Sellers, and Riders</p>
   </header>
 
-  <main>
-    <h2>Choose your role</h2>
-    <p style="margin-top: 8px; color: #475569;">
-      A safe way for buyers, sellers, and riders to complete transactions with confidence.
-    </p>
+  <div class="btn-container">
+    <button class="btn" onclick="navigateTo('buyer.html')">Buyer</button>
+    <button class="btn" onclick="navigateTo('seller.html')">Seller</button>
+    <button class="btn" onclick="navigateTo('rider.html')">Rider</button>
+  </div>
 
-    <div class="buttons">
-      <button class="btn">Buyer</button>
-      <button class="btn">Seller</button>
-      <button class="btn btn-outline">Rider</button>
-    </div>
-  </main>
-
-  <footer>
-    © <span id="year"></span> PaceHold — Secure escrow for small businesses.
-  </footer>
+  <footer>© 2025 PaceHold. All rights reserved.</footer>
 
   <script>
-    // auto-update the year in the footer
-    document.getElementById("year").textContent = new Date().getFullYear();
+    function navigateTo(page) {
+      document.body.classList.add('fade');
+      setTimeout(() => {
+        window.location.href = page;
+      }, 300);
+    }
   </script>
 </body>
 </html>
