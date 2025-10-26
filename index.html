@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #0072ff, #00c6ff);
+      background: linear-gradient(135deg, #001a33, #0047ab);
       color: white;
       display: flex;
       flex-direction: column;
@@ -17,12 +17,12 @@
       margin: 0;
     }
     .container {
-      background: rgba(255,255,255,0.1);
-      padding: 25px;
+      background: rgba(255,255,255,0.08);
+      padding: 30px;
       border-radius: 20px;
       width: 90%;
       max-width: 400px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
     }
     input {
       width: 100%;
@@ -31,17 +31,17 @@
       border: none;
       border-radius: 10px;
       outline: none;
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.15);
       color: white;
       font-size: 15px;
     }
     input::placeholder {
-      color: #eee;
+      color: #ddd;
     }
     button {
       width: 100%;
       padding: 12px;
-      background-color: #00c6ff;
+      background-color: #0072ff;
       color: white;
       border: none;
       border-radius: 10px;
@@ -51,7 +51,7 @@
       transition: 0.3s;
     }
     button:hover {
-      background-color: #009ee2;
+      background-color: #005fe0;
       transform: scale(1.03);
     }
     h1 {
@@ -69,13 +69,11 @@
     <button id="loginBtn">Login</button>
   </div>
 
-  <!-- ✅ Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
       from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
-    // ✅ Initialize Firebase first
     const firebaseConfig = {
       apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
       authDomain: "pacehold-4c7b2.firebaseapp.com",
@@ -88,7 +86,6 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // ✅ Now attach event listeners AFTER initialization
     window.addEventListener('DOMContentLoaded', () => {
       const emailField = document.getElementById("email");
       const passwordField = document.getElementById("password");
