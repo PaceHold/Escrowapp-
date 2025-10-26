@@ -1,158 +1,134 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>PaceHold</title>
-<style>
-  :root{--blue:#1a73e8;--dark:#0f172a;--muted:#64748b}
-  *{box-sizing:border-box}
-  body{font-family:Inter,system-ui,Arial; margin:0; background:#f6f9ff; color:#0b1a2b; display:flex; justify-content:center; padding:28px;}
-  .wrap{width:100%;max-width:520px;background:#fff;border-radius:16px;box-shadow:0 14px 40px rgba(12,35,80,0.08);overflow:hidden}
-  header{background:linear-gradient(180deg,var(--blue),#145ec8);color:#fff;padding:22px;text-align:center}
-  header h1{margin:0;font-size:22px}
-  header p{margin:6px 0 0;opacity:0.95}
-  main{padding:20px}
-  .role-grid{display:grid;grid-template-columns:1fr;gap:12px}
-  .card{background:#f8fbff;border-radius:12px;padding:14px;text-align:center}
-  .btn{display:inline-block;background:var(--blue);color:#fff;padding:12px 18px;border-radius:12px;border:0;font-weight:700;cursor:pointer;width:100%}
-  .btn.ghost{background:#fff;color:var(--blue);border:2px solid rgba(26,115,232,0.12)}
-  .links{display:flex;gap:10px;margin-top:12px}
-  .small{font-size:13px;color:var(--muted)}
-  footer{padding:14px;text-align:center;background:#fbfdff;border-top:1px solid #eef6ff}
-  a.nav{color:var(--blue);font-weight:700;text-decoration:none}
-  @media(min-width:640px){ .role-grid{grid-template-columns:repeat(3,1fr)} }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PaceHold | Escrow Platform</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(180deg, #0e172c, #1b1f3a);
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #12192b;
+      padding: 20px 0;
+      font-size: 1.5em;
+      font-weight: 600;
+      color: #00c6ff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .container {
+      max-width: 400px;
+      margin: 60px auto;
+      background: rgba(255,255,255,0.05);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+    }
+    input {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+    }
+    button {
+      width: 95%;
+      padding: 12px;
+      background: #00c6ff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      color: #fff;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #0096c7;
+    }
+    .form-container {
+      margin-top: 25px;
+    }
+    .note {
+      font-size: 0.9em;
+      color: #ccc;
+      margin-top: 15px;
+    }
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>PaceHold</h1>
-      <p>Secure escrow payments · Trusted deliveries</p>
-    </header>
+  <header>PaceHold Secure Escrow</header>
 
-    <main>
-      <div class="role-grid">
-        <div class="card">
-          <div class="small">Buyer</div>
-          <button class="btn" onclick="location.href='buyer.html'">Open Buyer</button>
-        </div>
-        <div class="card">
-          <div class="small">Seller</div>
-          <button class="btn" onclick="location.href='seller.html'">Open Seller</button>
-        </div>
-        <div class="card">
-          <div class="small">Rider</div>
-          <button class="btn" onclick="location.href='rider.html'">Open Rider</button>
-        </div>
-      </div>
-
-      <div style="margin-top:16px" class="card">
-        <div style="display:flex;gap:8px">
-          <button class="btn ghost" onclick="location.href='buyer.html'">Start sample flow</button>
-          <button class="btn ghost" onclick="location.href='seller.html'">Check transaction</button>
-        </div>
-        <div style="margin-top:10px" class="small">This is a client-side prototype using localStorage. No real money moves.</div>
-      </div>
-    </main>
-
-    <footer>
-      © <span id="year"></span> PaceHold — demo prototype
-    </footer>
+  <div class="container">
+    <h2>Login</h2>
+    <input type="email" id="loginEmail" placeholder="Enter your email" required>
+    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+    <button onclick="loginUser()">Login</button>
   </div>
 
-<script>
-  document.getElementById('year').textContent = new Date().getFullYear();
-</script>
+  <div class="container form-container">
+    <h2>Create Account</h2>
+    <input type="email" id="registerEmail" placeholder="Enter your email" required>
+    <input type="password" id="registerPassword" placeholder="Enter your password" required>
+    <button onclick="registerUser()">Register</button>
+  </div>
+
+  <p class="note">Your transactions stay protected — powered by PaceHold Escrow System.</p>
+
   <!-- Firebase SDKs -->
-<script type="module">
-  // Import Firebase
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
-    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-  import { getFirestore } 
-    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"></script>
 
-  // 🔥 Your Firebase config (copied from your screenshot)
-  const firebaseConfig = {
-    apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
-    authDomain: "pacehold-4c7b2.firebaseapp.com",
-    projectId: "pacehold-4c7b2",
-    storageBucket: "pacehold-4c7b2.appspot.com",
-    messagingSenderId: "45898843261",
-    appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
-  };
+  <script>
+    // 🔹 Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
+      authDomain: "pacehold-4c7b2.firebaseapp.com",
+      projectId: "pacehold-4c7b2",
+      storageBucket: "pacehold-4c7b2.firebasestorage.app",
+      messagingSenderId: "45898843261",
+      appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-</script>
-  <!-- Firebase App (core SDK) -->
-<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
-<!-- Firebase Authentication -->
-<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
-<!-- Firebase Firestore (optional for data storage) -->
-<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"></script>
+    // 🔹 Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-<script>
-  // Your Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
-    authDomain: "pacehold-4c7b2.firebaseapp.com",
-    projectId: "pacehold-4c7b2",
-    storageBucket: "pacehold-4c7b2.firebasestorage.app",
-    messagingSenderId: "45898843261",
-    appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
-  };
+    // 🔹 Register Function
+    async function registerUser() {
+      const email = document.getElementById("registerEmail").value;
+      const password = document.getElementById("registerPassword").value;
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        alert("✅ Account created successfully!");
+        console.log("User:", userCredential.user);
+      } catch (error) {
+        alert("❌ " + error.message);
+        console.error(error);
+      }
+    }
 
-  // Initialize Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-  ```html
-‎<script>
-‎  // SIGN UP FUNCTION
-‎  async function registerUser() {
-‎    const email = document.getElementById("registerEmail").value;
-‎    const password = document.getElementById("registerPassword").value;
-‎    try {
-‎      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-‎      alert("Account created successfully!");
-‎      console.log("User:", userCredential.user);
-‎    } catch (error) {
-‎      alert(error.message);
-‎    }
-‎  }
-‎
-‎  // LOGIN FUNCTION
-‎  async function loginUser() {
-‎    const email = document.getElementById("loginEmail").value;
-‎    const password = document.getElementById("loginPassword").value;
-‎    try {
-‎      const userCredential = await auth.signInWithEmailAndPassword(email, password);
-‎      alert("Login successful!");
-‎      console.log("User:", userCredential.user);
-‎    } catch (error) {
-‎      alert(error.message);
-‎    }
-‎  }
-‎</script>
-</script>
-  <!-- LOGIN FORM -->
-<div class="form-container">
-  <h2>Login</h2>
-  <input type="email" id="loginEmail" placeholder="Enter your email" required>
-  <input type="password" id="loginPassword" placeholder="Enter your password" required>
-  <button onclick="loginUser()">Login</button>
-</div>
-
-<!-- REGISTER FORM -->
-<div class="form-container">
-  <h2>Create Account</h2>
-  <input type="email" id="registerEmail" placeholder="Enter your email" required>
-  <input type="password" id="registerPassword" placeholder="Enter your password" required>
-  <button onclick="registerUser()">Register</button>
-</div>
+    // 🔹 Login Function
+    async function loginUser() {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        alert("✅ Login successful!");
+        console.log("User:", userCredential.user);
+      } catch (error) {
+        alert("❌ " + error.message);
+        console.error(error);
+      }
+    }
+  </script>
 </body>
 </html>
