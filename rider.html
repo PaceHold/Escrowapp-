@@ -1,50 +1,31 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>PaceHold · Rider</title>
-<style>
-  :root{--blue:#1a73e8;--muted:#64748b}
-  body{font-family:Inter,system-ui,Arial;margin:0;background:#f6f9ff;color:#071028;display:flex;justify-content:center;padding:22px}
-  .wrap{width:100%;max-width:520px;background:#fff;border-radius:14px;box-shadow:0 12px 32px rgba(10,30,70,0.06);overflow:hidden}
-  header{background:var(--blue);color:#fff;padding:18px;text-align:center}
-  main{padding:18px}
-  .card{background:#fff;padding:14px;border-radius:12px;margin-bottom:12px}
-  .btn{background:var(--blue);color:#fff;padding:12px;border-radius:10px;border:0;width:100%;font-weight:700;cursor:pointer}
-  .map{background:#eef6ff;border-radius:10px;padding:10px;color:#155fc0;margin-top:10px}
-  .back{display:inline-block;margin-top:12px;color:var(--blue);text-decoration:none}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rider | PaceHold</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(145deg, #000428, #004e92);
+      color: white;
+      text-align: center;
+      padding-top: 80px;
+    }
+    button {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 30px;
+    }
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <header><h2>Rider</h2><div class="small">Pickup, track and confirm delivery</div></header>
-    <main>
-      <div class="card" id="txArea"></div>
-
-      <div class="card">
-        <button class="btn" onclick="startTransit()">Start Transit</button>
-        <button class="btn" style="margin-top:8px;background:#0b8a46" onclick="arrive()">Confirm Arrival</button>
-        <div class="map" id="mapBox">Map: Not started</div>
-        <a class="back" href="index.html">← Home</a>
-      </div>
-    </main>
-  </div>
-
-<script src="transaction.js"></script>
-<script>
-  function render(){ renderTxTo('txArea'); }
-  function startTransit(){
-    updateStatus('In Transit');
-    document.getElementById('mapBox').textContent = 'Rider en route (simulated)...';
-    render();
-  }
-  function arrive(){
-    updateStatus('Delivered');
-    document.getElementById('mapBox').textContent = 'Rider arrived at destination.';
-    render();
-  }
-  // init
-  render();
-</script>
+  <h1>Rider Dashboard</h1>
+  <p>Track routes, verify codes, and complete deliveries.</p>
+  <button onclick="window.location.href='dashboard.html'">⬅ Back to Dashboard</button>
 </body>
 </html>
