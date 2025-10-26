@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #001a33, #0047ab);
+      background: radial-gradient(circle at top left, #000428, #004e92);
       color: white;
       display: flex;
       flex-direction: column;
@@ -16,14 +16,25 @@
       height: 100vh;
       margin: 0;
     }
+
     .container {
-      background: rgba(255,255,255,0.08);
+      background: rgba(255, 255, 255, 0.08);
       padding: 30px;
-      border-radius: 20px;
+      border-radius: 18px;
       width: 90%;
       max-width: 400px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
     }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: 1px;
+    }
+
     input {
       width: 100%;
       padding: 12px;
@@ -31,32 +42,37 @@
       border: none;
       border-radius: 10px;
       outline: none;
-      background: rgba(255,255,255,0.15);
+      background: rgba(255, 255, 255, 0.15);
       color: white;
       font-size: 15px;
+      transition: 0.3s;
     }
+
+    input:focus {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
     input::placeholder {
-      color: #ddd;
+      color: #ccc;
     }
+
     button {
       width: 100%;
       padding: 12px;
-      background-color: #0072ff;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
       color: white;
       border: none;
       border-radius: 10px;
       font-size: 16px;
+      font-weight: 500;
       cursor: pointer;
       margin-top: 10px;
       transition: 0.3s;
     }
+
     button:hover {
-      background-color: #005fe0;
-      transform: scale(1.03);
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
+      transform: scale(1.05);
+      opacity: 0.9;
     }
   </style>
 </head>
@@ -86,33 +102,27 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const emailField = document.getElementById("email");
-      const passwordField = document.getElementById("password");
+    document.addEventListener('DOMContentLoaded', () => {
+      const email = document.getElementById("email");
+      const password = document.getElementById("password");
       const registerBtn = document.getElementById("registerBtn");
       const loginBtn = document.getElementById("loginBtn");
 
-      // Register
       registerBtn.addEventListener("click", async () => {
-        const email = emailField.value;
-        const password = passwordField.value;
         try {
-          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          alert("✅ Account created successfully for: " + userCredential.user.email);
+          const user = await createUserWithEmailAndPassword(auth, email.value, password.value);
+          alert(`✅ Account created: ${user.user.email}`);
         } catch (error) {
-          alert("⚠️ Error: " + error.message);
+          alert("⚠️ " + error.message);
         }
       });
 
-      // Login
       loginBtn.addEventListener("click", async () => {
-        const email = emailField.value;
-        const password = passwordField.value;
         try {
-          const userCredential = await signInWithEmailAndPassword(auth, email, password);
-          alert("✅ Logged in successfully: " + userCredential.user.email);
+          const user = await signInWithEmailAndPassword(auth, email.value, password.value);
+          alert(`✅ Welcome back, ${user.user.email}`);
         } catch (error) {
-          alert("⚠️ Error: " + error.message);
+          alert("⚠️ " + error.message);
         }
       });
     });
