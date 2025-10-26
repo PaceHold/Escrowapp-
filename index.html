@@ -110,6 +110,49 @@
   const app = firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  ```html
+‎<script>
+‎  // SIGN UP FUNCTION
+‎  async function registerUser() {
+‎    const email = document.getElementById("registerEmail").value;
+‎    const password = document.getElementById("registerPassword").value;
+‎    try {
+‎      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+‎      alert("Account created successfully!");
+‎      console.log("User:", userCredential.user);
+‎    } catch (error) {
+‎      alert(error.message);
+‎    }
+‎  }
+‎
+‎  // LOGIN FUNCTION
+‎  async function loginUser() {
+‎    const email = document.getElementById("loginEmail").value;
+‎    const password = document.getElementById("loginPassword").value;
+‎    try {
+‎      const userCredential = await auth.signInWithEmailAndPassword(email, password);
+‎      alert("Login successful!");
+‎      console.log("User:", userCredential.user);
+‎    } catch (error) {
+‎      alert(error.message);
+‎    }
+‎  }
+‎</script>
 </script>
+  <!-- LOGIN FORM -->
+<div class="form-container">
+  <h2>Login</h2>
+  <input type="email" id="loginEmail" placeholder="Enter your email" required>
+  <input type="password" id="loginPassword" placeholder="Enter your password" required>
+  <button onclick="loginUser()">Login</button>
+</div>
+
+<!-- REGISTER FORM -->
+<div class="form-container">
+  <h2>Create Account</h2>
+  <input type="email" id="registerEmail" placeholder="Enter your email" required>
+  <input type="password" id="registerPassword" placeholder="Enter your password" required>
+  <button onclick="registerUser()">Register</button>
+</div>
 </body>
 </html>
