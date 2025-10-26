@@ -5,11 +5,12 @@
   <title>Login</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
     body {
       margin: 0;
       font-family: 'Arial', sans-serif;
-      background: #0A1F44; /* deep blue */
+      background: #0A1F44;
       color: #fff;
       display: flex;
       justify-content: center;
@@ -43,13 +44,8 @@
       color: white;
       transition: background 0.3s;
     }
-    button:hover {
-      background: #0F74D0;
-    }
-    p#message {
-      margin-top: 10px;
-      color: #FFB74D;
-    }
+    button:hover { background: #0F74D0; }
+    p#message { margin-top: 10px; color: #FFB74D; }
   </style>
 </head>
 <body>
@@ -57,41 +53,66 @@
     <h2>Welcome Back</h2>
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+    <select id="role">
+      <option value="buyer">Buyer</option>
+      <option value="seller">Seller</option>
+    </select>
+    <button onclick="login()">Login / Sign Up</button>
     <p id="message"></p>
   </div>
 
   <script>
-    // 🔹 Your Firebase config
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
+      authDomain: "pacehold-4c7b2.firebaseapp.com",
+      projectId: "pacehold-4c7b2",
+      storageBucket: "pacehold-4c7b2.firebasestorage.app",
+      messagingSenderId: "45898843261",
+      appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
     };
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
 
     function login() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      document.getElementById('message').innerText = "Logging in...";
+      const role = document.getElementById('role').value;
+      document.getElementById('message').innerText = "Processing...";
 
+      // Try sign in first
       auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          document.getElementById('message').innerText = "Login successful! Redirecting...";
-          window.location.href = "dashboard.html";
+        .then(userCredential => {
+          redirectDashboard(userCredential.user.uid);
         })
-        .catch((error) => {
-          document.getElementById('message').innerText = error.message;
+        .catch(error => {
+          // If login fails, sign up the user
+          auth.createUserWithEmailAndPassword(email, password)
+            .then(userCredential => {
+              // Save role in Firestore
+              db.collection('users').doc(userCredential.user.uid).set({
+                email: email,
+                role: role
+              }).then(() => redirectDashboard(userCredential.user.uid));
+            })
+            .catch(err => {
+              document.getElementById('message').innerText = err.message;
+            });
         });
     }
 
-    auth.onAuthStateChanged((user) => {
-      if (user) window.location.href = "dashboard.html";
+    function redirectDashboard(uid) {
+      db.collection('users').doc(uid).get().then(doc => {
+        if (doc.exists) {
+          const role = doc.data().role;
+          window.location.href = `dashboard.html?role=${role}`;
+        }
+      });
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (user) redirectDashboard(user.uid);
     });
   </script>
 </body>
