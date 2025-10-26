@@ -5,49 +5,15 @@
   <title>Dashboard</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      background: #0A1F44;
-      color: #fff;
-    }
-    header {
-      background: #112B55;
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-      color: #1E90FF;
-    }
-    header button {
-      padding: 10px 20px;
-      background: #1E90FF;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      color: white;
-      font-size: 14px;
-      transition: background 0.3s;
-    }
-    header button:hover {
-      background: #0F74D0;
-    }
-    main {
-      padding: 40px;
-    }
-    .card {
-      background: #112B55;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      margin-bottom: 20px;
-    }
+    body { margin: 0; font-family: 'Arial', sans-serif; background: #0A1F44; color: #fff; }
+    header { background: #112B55; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+    header h1 { margin: 0; font-size: 24px; color: #1E90FF; }
+    header button { padding: 10px 20px; background: #1E90FF; border: none; border-radius: 8px; cursor: pointer; color: white; font-size: 14px; transition: background 0.3s; }
+    header button:hover { background: #0F74D0; }
+    main { padding: 40px; }
+    .card { background: #112B55; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); margin-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -57,33 +23,47 @@
   </header>
   <main>
     <div class="card">
-      <h2 id="user-info">Loading user...</h2>
+      <h2 id="welcome">Loading...</h2>
     </div>
-    <div class="card">
-      <h3>Account Summary</h3>
-      <p>Here you can show financial or app stats...</p>
+    <div class="card" id="role-content">
+      <h3>Data</h3>
+      <p>Loading content based on role...</p>
     </div>
   </main>
 
   <script>
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
+      authDomain: "pacehold-4c7b2.firebaseapp.com",
+      projectId: "pacehold-4c7b2",
+      storageBucket: "pacehold-4c7b2.firebasestorage.app",
+      messagingSenderId: "45898843261",
+      appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
     };
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        document.getElementById('user-info').innerText = `Welcome, ${user.email}`;
-      } else {
-        window.location.href = "index.html";
-      }
+    function getRoleFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('role');
+    }
+
+    auth.onAuthStateChanged(user => {
+      if (!user) { window.location.href = "index.html"; return; }
+
+      db.collection('users').doc(user.uid).get().then(doc => {
+        const role = doc.data().role;
+        document.getElementById('welcome').innerText = `Welcome, ${user.email} (${role})`;
+
+        const roleContent = document.getElementById('role-content');
+        if (role === 'buyer') {
+          roleContent.innerHTML = `<h3>Buyers Panel</h3><p>Here you can view sellers and place orders.</p>`;
+        } else if (role === 'seller') {
+          roleContent.innerHTML = `<h3>Sellers Panel</h3><p>Here you can see buyer requests and manage products.</p>`;
+        }
+      });
     });
 
     function logout() {
