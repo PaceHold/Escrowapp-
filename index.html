@@ -1,93 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PaceHold | Escrow Platform</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PaceHold – Secure Escrow</title>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(180deg, #0e172c, #1b1f3a);
-      color: #fff;
-      text-align: center;
+      background: linear-gradient(135deg, #0072ff, #00c6ff);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
       margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #12192b;
-      padding: 20px 0;
-      font-size: 1.5em;
-      font-weight: 600;
-      color: #00c6ff;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
     .container {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 16px;
+      width: 90%;
       max-width: 400px;
-      margin: 60px auto;
-      background: rgba(255,255,255,0.05);
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     input {
-      width: 90%;
+      width: 100%;
       padding: 12px;
-      margin: 10px 0;
+      margin: 8px 0;
       border: none;
       border-radius: 8px;
-      font-size: 1em;
+      outline: none;
     }
     button {
-      width: 95%;
+      width: 100%;
       padding: 12px;
-      background: #00c6ff;
+      background-color: #00c6ff;
+      color: white;
       border: none;
       border-radius: 8px;
-      font-size: 1em;
-      font-weight: 600;
+      font-size: 16px;
       cursor: pointer;
-      color: #fff;
-      transition: 0.3s;
+      margin-top: 8px;
     }
     button:hover {
-      background: #0096c7;
+      background-color: #009ee2;
     }
-    .form-container {
-      margin-top: 25px;
-    }
-    .note {
-      font-size: 0.9em;
-      color: #ccc;
-      margin-top: 15px;
+    h1 {
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <header>PaceHold Secure Escrow</header>
-
   <div class="container">
-    <h2>Login</h2>
-    <input type="email" id="loginEmail" placeholder="Enter your email" required>
-    <input type="password" id="loginPassword" placeholder="Enter your password" required>
-    <button onclick="loginUser()">Login</button>
+    <h1>PaceHold</h1>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="registerBtn">Register</button>
+    <button id="loginBtn">Login</button>
   </div>
 
-  <div class="container form-container">
-    <h2>Create Account</h2>
-    <input type="email" id="registerEmail" placeholder="Enter your email" required>
-    <input type="password" id="registerPassword" placeholder="Enter your password" required>
-    <button onclick="registerUser()">Register</button>
-  </div>
+  <!-- ✅ Firebase SDK -->
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
-  <p class="note">Your transactions stay protected — powered by PaceHold Escrow System.</p>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"></script>
-
-  <script>
-    // 🔹 Firebase Configuration
+    // Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
       authDomain: "pacehold-4c7b2.firebaseapp.com",
@@ -97,38 +77,33 @@
       appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
     };
 
-    // 🔹 Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    // 🔹 Register Function
-    async function registerUser() {
-      const email = document.getElementById("registerEmail").value;
-      const password = document.getElementById("registerPassword").value;
+    // Register new user
+    document.getElementById("registerBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
       try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        alert("✅ Account created successfully!");
-        console.log("User:", userCredential.user);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        alert("✅ Account created successfully for: " + userCredential.user.email);
       } catch (error) {
-        alert("❌ " + error.message);
-        console.error(error);
+        alert("Error: " + error.message);
       }
-    }
+    });
 
-    // 🔹 Login Function
-    async function loginUser() {
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
+    // Login existing user
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
       try {
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        alert("✅ Login successful!");
-        console.log("User:", userCredential.user);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        alert("✅ Logged in successfully: " + userCredential.user.email);
       } catch (error) {
-        alert("❌ " + error.message);
-        console.error(error);
+        alert("Error: " + error.message);
       }
-    }
+    });
   </script>
 </body>
 </html>
