@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>Login / Sign Up</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -17,15 +17,27 @@
       align-items: center;
       height: 100vh;
     }
-    .login-container {
+    .container {
       background: #112B55;
       padding: 40px;
       border-radius: 15px;
+      width: 400px;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      width: 350px;
-      text-align: center;
     }
-    input {
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    .tab.active { border-bottom: 2px solid #1E90FF; color: #1E90FF; }
+    input, select {
       width: 100%;
       padding: 12px;
       margin: 10px 0;
@@ -45,20 +57,39 @@
       transition: background 0.3s;
     }
     button:hover { background: #0F74D0; }
-    p#message { margin-top: 10px; color: #FFB74D; }
+    p#message { margin-top: 10px; color: #FFB74D; text-align: center; }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h2>Welcome Back</h2>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <select id="role">
-      <option value="buyer">Buyer</option>
-      <option value="seller">Seller</option>
-    </select>
-    <button onclick="login()">Login / Sign Up</button>
-    <p id="message"></p>
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('login')">Login</div>
+      <div class="tab" onclick="showTab('signup')">Sign Up</div>
+    </div>
+
+    <!-- Login Form -->
+    <div id="login-form">
+      <input type="email" id="login-email" placeholder="Email">
+      <input type="password" id="login-password" placeholder="Password">
+      <select id="login-role">
+        <option value="buyer">Buyer</option>
+        <option value="seller">Seller</option>
+      </select>
+      <button onclick="login()">Login</button>
+      <p id="message-login"></p>
+    </div>
+
+    <!-- Sign Up Form -->
+    <div id="signup-form" style="display:none;">
+      <input type="email" id="signup-email" placeholder="Email">
+      <input type="password" id="signup-password" placeholder="Password">
+      <select id="signup-role">
+        <option value="buyer">Buyer</option>
+        <option value="seller">Seller</option>
+      </select>
+      <button onclick="signup()">Sign Up</button>
+      <p id="message-signup"></p>
+    </div>
   </div>
 
   <script>
@@ -75,30 +106,43 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const role = document.getElementById('role').value;
-      document.getElementById('message').innerText = "Processing...";
+    function showTab(tab) {
+      document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+      const tabs = document.querySelectorAll('.tab');
+      tabs[0].classList.toggle('active', tab === 'login');
+      tabs[1].classList.toggle('active', tab === 'signup');
+      document.getElementById('message-login').innerText = '';
+      document.getElementById('message-signup').innerText = '';
+    }
 
-      // Try sign in first
+    function login() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      document.getElementById('message-login').innerText = "Logging in...";
       auth.signInWithEmailAndPassword(email, password)
         .then(userCredential => {
           redirectDashboard(userCredential.user.uid);
         })
         .catch(error => {
-          // If login fails, sign up the user
-          auth.createUserWithEmailAndPassword(email, password)
-            .then(userCredential => {
-              // Save role in Firestore
-              db.collection('users').doc(userCredential.user.uid).set({
-                email: email,
-                role: role
-              }).then(() => redirectDashboard(userCredential.user.uid));
-            })
-            .catch(err => {
-              document.getElementById('message').innerText = err.message;
-            });
+          document.getElementById('message-login').innerText = error.message;
+        });
+    }
+
+    function signup() {
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+      const role = document.getElementById('signup-role').value;
+      document.getElementById('message-signup').innerText = "Signing up...";
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          db.collection('users').doc(userCredential.user.uid).set({
+            email: email,
+            role: role
+          }).then(() => redirectDashboard(userCredential.user.uid));
+        })
+        .catch(error => {
+          document.getElementById('message-signup').innerText = error.message;
         });
     }
 
