@@ -1,91 +1,68 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PaceHold</title>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(180deg, #f5f8ff 0%, #e8f0ff 100%);
-      color: #1a1f36;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #1a73e8;
-      color: #fff;
-      padding: 2rem 1rem;
-      border-bottom-left-radius: 2rem;
-      border-bottom-right-radius: 2rem;
-    }
-    h1 {
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
-    }
-    p {
-      color: #e0e7ff;
-    }
-    .btn-container {
-      margin: 3rem 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
-    .btn {
-      background: #1a73e8;
-      color: #fff;
-      border: none;
-      border-radius: 1.5rem;
-      padding: 1rem 2.5rem;
-      width: 80%;
-      max-width: 300px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .btn:hover {
-      background: #155fc0;
-      transform: scale(1.03);
-    }
-    footer {
-      margin-top: 4rem;
-      padding: 1rem;
-      color: #555;
-      font-size: 0.9rem;
-    }
-    .fade {
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PaceHold</title>
+<style>
+  :root{--blue:#1a73e8;--dark:#0f172a;--muted:#64748b}
+  *{box-sizing:border-box}
+  body{font-family:Inter,system-ui,Arial; margin:0; background:#f6f9ff; color:#0b1a2b; display:flex; justify-content:center; padding:28px;}
+  .wrap{width:100%;max-width:520px;background:#fff;border-radius:16px;box-shadow:0 14px 40px rgba(12,35,80,0.08);overflow:hidden}
+  header{background:linear-gradient(180deg,var(--blue),#145ec8);color:#fff;padding:22px;text-align:center}
+  header h1{margin:0;font-size:22px}
+  header p{margin:6px 0 0;opacity:0.95}
+  main{padding:20px}
+  .role-grid{display:grid;grid-template-columns:1fr;gap:12px}
+  .card{background:#f8fbff;border-radius:12px;padding:14px;text-align:center}
+  .btn{display:inline-block;background:var(--blue);color:#fff;padding:12px 18px;border-radius:12px;border:0;font-weight:700;cursor:pointer;width:100%}
+  .btn.ghost{background:#fff;color:var(--blue);border:2px solid rgba(26,115,232,0.12)}
+  .links{display:flex;gap:10px;margin-top:12px}
+  .small{font-size:13px;color:var(--muted)}
+  footer{padding:14px;text-align:center;background:#fbfdff;border-top:1px solid #eef6ff}
+  a.nav{color:var(--blue);font-weight:700;text-decoration:none}
+  @media(min-width:640px){ .role-grid{grid-template-columns:repeat(3,1fr)} }
+</style>
 </head>
 <body>
-  <header>
-    <h1>PaceHold</h1>
-    <p>Secure Escrow Payments for Buyers, Sellers, and Riders</p>
-  </header>
-  
-<div class="actions">
-  <button onclick="createTransaction('John (Buyer)', 'Amina (Seller)', 30000, 'Shoes')">Lock ₦30,000 Escrow</button>
-  <button onclick="showTransaction()">View Transaction</button>
-  <button onclick="releaseFunds()">Release Funds</button>
-  <a href='seller.html' class='link'>Go to Seller Page →</a>
-</div>
-  
-  <footer>© 2025 PaceHold. All rights reserved.</footer>
+  <div class="wrap">
+    <header>
+      <h1>PaceHold</h1>
+      <p>Secure escrow payments · Trusted deliveries</p>
+    </header>
 
-  <script>
-    function navigateTo(page) {
-      document.body.classList.add('fade');
-      setTimeout(() => {
-        window.location.href = page;
-      }, 300);
-    }
-  </script>
-  <script src="transaction.js"></script>
+    <main>
+      <div class="role-grid">
+        <div class="card">
+          <div class="small">Buyer</div>
+          <button class="btn" onclick="location.href='buyer.html'">Open Buyer</button>
+        </div>
+        <div class="card">
+          <div class="small">Seller</div>
+          <button class="btn" onclick="location.href='seller.html'">Open Seller</button>
+        </div>
+        <div class="card">
+          <div class="small">Rider</div>
+          <button class="btn" onclick="location.href='rider.html'">Open Rider</button>
+        </div>
+      </div>
+
+      <div style="margin-top:16px" class="card">
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" onclick="location.href='buyer.html'">Start sample flow</button>
+          <button class="btn ghost" onclick="location.href='seller.html'">Check transaction</button>
+        </div>
+        <div style="margin-top:10px" class="small">This is a client-side prototype using localStorage. No real money moves.</div>
+      </div>
+    </main>
+
+    <footer>
+      © <span id="year"></span> PaceHold — demo prototype
+    </footer>
+  </div>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
