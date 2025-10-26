@@ -1,130 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PaceHold – Secure Escrow</title>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background: radial-gradient(circle at top left, #000428, #004e92);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
       margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #0A1F44; /* deep blue */
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
-
-    .container {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 30px;
-      border-radius: 18px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(10px);
-    }
-
-    h1 {
+    .login-container {
+      background: #112B55;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      width: 350px;
       text-align: center;
-      margin-bottom: 24px;
-      font-weight: 600;
-      color: #ffffff;
-      letter-spacing: 1px;
     }
-
     input {
       width: 100%;
       padding: 12px;
-      margin: 8px 0;
+      margin: 10px 0;
+      border-radius: 8px;
       border: none;
-      border-radius: 10px;
-      outline: none;
-      background: rgba(255, 255, 255, 0.15);
-      color: white;
-      font-size: 15px;
-      transition: 0.3s;
     }
-
-    input:focus {
-      background: rgba(255, 255, 255, 0.25);
-    }
-
-    input::placeholder {
-      color: #ccc;
-    }
-
     button {
       width: 100%;
       padding: 12px;
-      background: linear-gradient(135deg, #00c6ff, #0072ff);
-      color: white;
+      margin-top: 15px;
+      background: #1E90FF;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       font-size: 16px;
-      font-weight: 500;
       cursor: pointer;
-      margin-top: 10px;
-      transition: 0.3s;
+      color: white;
+      transition: background 0.3s;
     }
-
     button:hover {
-      transform: scale(1.05);
-      opacity: 0.9;
+      background: #0F74D0;
+    }
+    p#message {
+      margin-top: 10px;
+      color: #FFB74D;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>PaceHold</h1>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <button id="registerBtn">Register</button>
-    <button id="loginBtn">Login</button>
+  <div class="login-container">
+    <h2>Welcome Back</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="message"></p>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
-      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-
+  <script>
+    // 🔹 Your Firebase config
     const firebaseConfig = {
-      apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
-      authDomain: "pacehold-4c7b2.firebaseapp.com",
-      projectId: "pacehold-4c7b2",
-      storageBucket: "pacehold-4c7b2.firebasestorage.app",
-      messagingSenderId: "45898843261",
-      appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const email = document.getElementById("email");
-      const password = document.getElementById("password");
-      const registerBtn = document.getElementById("registerBtn");
-      const loginBtn = document.getElementById("loginBtn");
+    function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      document.getElementById('message').innerText = "Logging in...";
 
-      registerBtn.addEventListener("click", async () => {
-        try {
-          const user = await createUserWithEmailAndPassword(auth, email.value, password.value);
-          alert(`✅ Account created: ${user.user.email}`);
-        } catch (error) {
-          alert("⚠️ " + error.message);
-        }
-      });
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          document.getElementById('message').innerText = "Login successful! Redirecting...";
+          window.location.href = "dashboard.html";
+        })
+        .catch((error) => {
+          document.getElementById('message').innerText = error.message;
+        });
+    }
 
-      loginBtn.addEventListener("click", async () => {
-        try {
-          const user = await signInWithEmailAndPassword(auth, email.value, password.value);
-          alert(`✅ Welcome back, ${user.user.email}`);
-        } catch (error) {
-          alert("⚠️ " + error.message);
-        }
-      });
+    auth.onAuthStateChanged((user) => {
+      if (user) window.location.href = "dashboard.html";
     });
   </script>
 </body>
