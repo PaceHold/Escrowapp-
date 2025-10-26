@@ -1,64 +1,31 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>PaceHold · Buyer</title>
-<link rel="stylesheet" href="">
-<style>
-  :root{--blue:#1a73e8;--muted:#64748b}
-  body{font-family:Inter,system-ui,Arial;margin:0;background:#f6f9ff;color:#071028;display:flex;justify-content:center;padding:22px}
-  .wrap{width:100%;max-width:520px;background:#fff;border-radius:14px;box-shadow:0 12px 32px rgba(10,30,70,0.06);overflow:hidden}
-  header{background:var(--blue);color:#fff;padding:18px;text-align:center}
-  main{padding:18px}
-  .card{background:#fff;padding:14px;border-radius:12px;margin-bottom:12px}
-  label{display:block;margin-top:8px;color:var(--muted);font-size:13px}
-  input{width:100%;padding:10px;border-radius:10px;border:1px solid #e6eefc;margin-top:6px}
-  .btn{background:var(--blue);color:#fff;padding:12px;border-radius:10px;border:0;width:100%;font-weight:700;cursor:pointer;margin-top:12px}
-  .small{font-size:13px;color:var(--muted);margin-top:8px}
-  .back{display:inline-block;margin-top:12px;color:var(--blue);text-decoration:none}
-  .txview{margin-top:10px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buyer | PaceHold</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(145deg, #000428, #004e92);
+      color: white;
+      text-align: center;
+      padding-top: 80px;
+    }
+    button {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 30px;
+    }
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <header><h2>Buyer</h2><div class="small">Lock payment, track delivery</div></header>
-    <main>
-      <div class="card">
-        <label>Buyer name</label>
-        <input id="buyerName" placeholder="e.g. John">
-        <label>Seller name / handle</label>
-        <input id="sellerName" placeholder="e.g. @amina_shop">
-        <label>Item</label>
-        <input id="itemName" placeholder="Wireless Earbuds">
-        <label>Amount (₦)</label>
-        <input id="amount" type="number" value="30000">
-        <button class="btn" onclick="doCreate()">Lock ₦ in Escrow</button>
-        <div class="small">This will simulate locking funds into escrow for the transaction.</div>
-      </div>
-
-      <div class="card txview" id="txArea"></div>
-
-      <div style="padding:8px">
-        <button class="btn" onclick="doRelease()" style="background:#0b8a46">Release Funds (after delivery)</button>
-        <a class="back" href="index.html">← Home</a>
-      </div>
-    </main>
-  </div>
-
-<script src="transaction.js"></script>
-<script>
-  function doCreate(){
-    const b = document.getElementById('buyerName').value || 'Buyer';
-    const s = document.getElementById('sellerName').value || 'Seller';
-    const item = document.getElementById('itemName').value || 'Goods';
-    const amount = Number(document.getElementById('amount').value) || 30000;
-    createTransaction(b,s,amount,item);
-    renderTx();
-  }
-  function renderTx(){ renderTxTo('txArea'); }
-  function doRelease(){ releaseFunds(); renderTx(); }
-  // render on load
-  renderTx();
-</script>
+  <h1>Buyer Dashboard</h1>
+  <p>Securely hold and release payments through escrow.</p>
+  <button onclick="window.location.href='dashboard.html'">⬅ Back to Dashboard</button>
 </body>
 </html>
