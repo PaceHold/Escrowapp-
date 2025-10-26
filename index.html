@@ -18,19 +18,25 @@
     }
     .container {
       background: rgba(255,255,255,0.1);
-      padding: 20px;
-      border-radius: 16px;
+      padding: 25px;
+      border-radius: 20px;
       width: 90%;
       max-width: 400px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
     }
     input {
       width: 100%;
       padding: 12px;
       margin: 8px 0;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       outline: none;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      font-size: 15px;
+    }
+    input::placeholder {
+      color: #eee;
     }
     button {
       width: 100%;
@@ -38,16 +44,19 @@
       background-color: #00c6ff;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
       cursor: pointer;
-      margin-top: 8px;
+      margin-top: 10px;
+      transition: 0.3s;
     }
     button:hover {
       background-color: #009ee2;
+      transform: scale(1.03);
     }
     h1 {
       text-align: center;
+      margin-bottom: 20px;
     }
   </style>
 </head>
@@ -62,12 +71,11 @@
 
   <!-- ✅ Firebase SDK -->
   <script type="module">
-    // Import Firebase modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
       from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
-    // Your Firebase config
+    // ✅ Initialize Firebase first
     const firebaseConfig = {
       apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
       authDomain: "pacehold-4c7b2.firebaseapp.com",
@@ -77,32 +85,39 @@
       appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Register new user
-    document.getElementById("registerBtn").addEventListener("click", async () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        alert("✅ Account created successfully for: " + userCredential.user.email);
-      } catch (error) {
-        alert("Error: " + error.message);
-      }
-    });
+    // ✅ Now attach event listeners AFTER initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      const emailField = document.getElementById("email");
+      const passwordField = document.getElementById("password");
+      const registerBtn = document.getElementById("registerBtn");
+      const loginBtn = document.getElementById("loginBtn");
 
-    // Login existing user
-    document.getElementById("loginBtn").addEventListener("click", async () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        alert("✅ Logged in successfully: " + userCredential.user.email);
-      } catch (error) {
-        alert("Error: " + error.message);
-      }
+      // Register
+      registerBtn.addEventListener("click", async () => {
+        const email = emailField.value;
+        const password = passwordField.value;
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          alert("✅ Account created successfully for: " + userCredential.user.email);
+        } catch (error) {
+          alert("⚠️ Error: " + error.message);
+        }
+      });
+
+      // Login
+      loginBtn.addEventListener("click", async () => {
+        const email = emailField.value;
+        const password = passwordField.value;
+        try {
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          alert("✅ Logged in successfully: " + userCredential.user.email);
+        } catch (error) {
+          alert("⚠️ Error: " + error.message);
+        }
+      });
     });
   </script>
 </body>
