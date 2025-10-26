@@ -64,5 +64,29 @@
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 </script>
+  <!-- Firebase SDKs -->
+<script type="module">
+  // Import Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getFirestore } 
+    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  // 🔥 Your Firebase config (copied from your screenshot)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
+    authDomain: "pacehold-4c7b2.firebaseapp.com",
+    projectId: "pacehold-4c7b2",
+    storageBucket: "pacehold-4c7b2.appspot.com",
+    messagingSenderId: "45898843261",
+    appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+</script>
 </body>
 </html>
