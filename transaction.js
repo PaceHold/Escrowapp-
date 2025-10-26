@@ -1,60 +1,66 @@
-// PaceHold Escrow Logic Simulation
-// Shared between buyer, seller, and rider
+// transaction.js - shared PaceHold transaction simulation (localStorage)
+const TRAN_KEY = "pacehold_tx";
 
-const TRANSACTION_KEY = "pacehold_transaction";
+function makeAlert(msg){ console.log(msg); /* keep console log for debug */ }
 
-// Create a transaction (Buyer)
-function createTransaction(buyer, seller, amount, item) {
-  const transaction = {
-    buyer,
-    seller,
-    amount,
-    item,
-    status: "Locked",
-    timestamp: new Date().toISOString(),
+function createTransaction(buyer='Buyer', seller='Seller', amount=30000, item='Item') {
+  const tx = {
+    id: 'TX' + Date.now(),
+    buyer, seller, amount, item,
+    status: 'Locked', createdAt: new Date().toISOString()
   };
-  localStorage.setItem(TRANSACTION_KEY, JSON.stringify(transaction));
-  alert("✅ Funds locked in escrow for " + item);
+  localStorage.setItem(TRAN_KEY, JSON.stringify(tx));
+  makeAlert('Transaction created: ' + tx.id);
+  return tx;
 }
 
-// Fetch current transaction (Seller / Rider)
 function getTransaction() {
-  const data = localStorage.getItem(TRANSACTION_KEY);
-  return data ? JSON.parse(data) : null;
+  const raw = localStorage.getItem(TRAN_KEY);
+  return raw ? JSON.parse(raw) : null;
 }
 
-// Update transaction status (Rider / Seller)
 function updateStatus(newStatus) {
-  const transaction = getTransaction();
-  if (transaction) {
-    transaction.status = newStatus;
-    localStorage.setItem(TRANSACTION_KEY, JSON.stringify(transaction));
-    alert("🔄 Transaction updated to: " + newStatus);
-  } else {
-    alert("No active transaction found.");
-  }
+  const tx = getTransaction();
+  if (!tx) { alert('No active transaction'); return null; }
+  tx.status = newStatus;
+  tx.updatedAt = new Date().toISOString();
+  localStorage.setItem(TRAN_KEY, JSON.stringify(tx));
+  makeAlert('Status: ' + newStatus);
+  return tx;
 }
 
-// Release funds (Buyer)
 function releaseFunds() {
-  const transaction = getTransaction();
-  if (transaction && transaction.status === "Delivered") {
-    transaction.status = "Released";
-    localStorage.setItem(TRANSACTION_KEY, JSON.stringify(transaction));
-    alert("💸 Funds released to seller!");
-  } else {
-    alert("Funds can only be released after delivery confirmation.");
-  }
+  const tx = getTransaction();
+  if (!tx) { alert('No active transaction'); return null; }
+  if (tx.status !== 'Delivered') { alert('Can only release after delivery'); return null; }
+  tx.status = 'Released';
+  tx.releasedAt = new Date().toISOString();
+  localStorage.setItem(TRAN_KEY, JSON.stringify(tx));
+  alert('Funds released to seller (simulated).');
+  return tx;
 }
 
-// View current transaction info (for testing)
-function showTransaction() {
-  const t = getTransaction();
-  if (t) {
-    alert(
-      `📦 Item: ${t.item}\n💰 Amount: ₦${t.amount}\n👤 Buyer: ${t.buyer}\n🧾 Seller: ${t.seller}\nStatus: ${t.status}`
-    );
-  } else {
-    alert("No active transaction.");
+function clearTransaction() {
+  localStorage.removeItem(TRAN_KEY);
+  alert('Transaction cleared (simulated).');
+}
+
+// helper to show in-page
+function renderTxTo(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const tx = getTransaction();
+  if (!tx) {
+    el.innerHTML = '<div class="empty">No active transaction.</div>';
+    return;
   }
+  el.innerHTML = `
+    <div class="tx">
+      <div><strong>${tx.item}</strong> · ${tx.id}</div>
+      <div>₦${Number(tx.amount).toLocaleString()}</div>
+      <div>Buyer: ${tx.buyer} · Seller: ${tx.seller}</div>
+      <div>Status: <strong>${tx.status}</strong></div>
+      <div class="small">Created: ${new Date(tx.createdAt).toLocaleString()}</div>
+    </div>
+  `;
 }
