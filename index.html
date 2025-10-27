@@ -1,176 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Login / Sign Up</title>
+
+  <!-- Firebase compat libs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
   <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      background-color: #001f3f;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: #012a63;
-      padding: 40px;
-      border-radius: 20px;
-      width: 350px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 10px;
-      border: none;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 10px;
-      background-color: #007bff;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .tab {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .tab button {
-      background: none;
-      border: none;
-      color: #bbb;
-      font-size: 16px;
-      font-weight: bold;
-      margin: 0 10px;
-      cursor: pointer;
-    }
-    .tab button.active {
-      color: white;
-      border-bottom: 2px solid #007bff;
-    }
-    #login-status {
-      text-align: center;
-      margin-top: 10px;
-      color: #ffcc00;
-    }
+    /* deep-blue fintech look (unchanged from your preference) */
+    :root{--bg:#001f3f;--card:#012a63;--accent:#007bff;--muted:#bbb;}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, "Poppins", system-ui, Arial;background:var(--bg);color:#fff;display:flex;align-items:center;justify-content:center;height:100vh}
+    .container{width:360px;background:var(--card);border-radius:16px;padding:28px;box-shadow:0 8px 30px rgba(0,0,0,0.45)}
+    .tabs{display:flex;justify-content:center;margin-bottom:12px}
+    .tabs button{background:none;border:none;color:var(--muted);padding:8px 16px;font-weight:600;cursor:pointer;border-radius:8px}
+    .tabs button.active{color:#fff;border-bottom:3px solid var(--accent)}
+    h2{text-align:center;margin:6px 0 18px}
+    input,select{width:100%;padding:10px;border-radius:10px;border:none;margin:8px 0;background:#08355d;color:#fff}
+    button.primary{width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-weight:700;cursor:pointer;margin-top:8px}
+    p.status{height:20px;text-align:center;color:#ffd24d;margin:8px 0 0}
+    label.small{font-size:13px;color:#ddd;margin-top:6px;display:block}
   </style>
 </head>
 <body>
-
   <div class="container">
-    <div class="tab">
+    <div class="tabs">
       <button id="loginTab" class="active" onclick="showTab('login')">Login</button>
       <button id="signupTab" onclick="showTab('signup')">Sign Up</button>
     </div>
 
-    <!-- LOGIN FORM -->
-    <div id="loginForm">
+    <!-- LOGIN -->
+    <div id="loginSection">
       <h2>Login</h2>
-      <input type="email" id="loginEmail" placeholder="Email" required />
-      <input type="password" id="loginPassword" placeholder="Password" required />
+      <input id="loginEmail" type="email" placeholder="Email" />
+      <input id="loginPassword" type="password" placeholder="Password" />
       <select id="loginRole">
         <option value="buyer">Buyer</option>
         <option value="seller">Seller</option>
+        <option value="rider">Rider</option>
       </select>
-      <button onclick="login()">Login</button>
-      <p id="login-status"></p>
+      <button class="primary" onclick="login()">Login</button>
+      <p id="loginStatus" class="status"></p>
     </div>
 
-    <!-- SIGNUP FORM -->
-    <div id="signupForm" style="display:none;">
+    <!-- SIGNUP -->
+    <div id="signupSection" style="display:none;">
       <h2>Sign Up</h2>
-      <input type="email" id="signupEmail" placeholder="Email" required />
-      <input type="password" id="signupPassword" placeholder="Password" required />
-      <select id="signupRole">
+      <input id="signupEmail" type="email" placeholder="Email" />
+      <input id="signupPassword" type="password" placeholder="Password" />
+      <select id="signupRole" onchange="updateSignupLabel()">
         <option value="buyer">Buyer</option>
         <option value="seller">Seller</option>
+        <option value="rider">Rider</option>
       </select>
-      <button onclick="signup()">Sign Up</button>
-      <p id="signup-status"></p>
+      <label class="small" id="nameLabel">Enter username</label>
+      <input id="signupName" type="text" placeholder="Username or Business name" />
+      <button class="primary" onclick="signup()">Create account</button>
+      <p id="signupStatus" class="status"></p>
     </div>
   </div>
 
+  <!-- your script file -->
+  <script src="script.js"></script>
   <script>
-    // --- Firebase Config (YOUR VALID CONFIG) ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
-      authDomain: "pacehold-4c7b2.firebaseapp.com",
-      projectId: "pacehold-4c7b2",
-      storageBucket: "pacehold-4c7b2.firebasestorage.app",
-      messagingSenderId: "45898843261",
-      appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Tab switch
-    function showTab(tab) {
-      document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
-      document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
-      document.getElementById('loginTab').classList.toggle('active', tab === 'login');
-      document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
+    // small UI helpers
+    function showTab(tab){
+      document.getElementById('loginSection').style.display = tab==='login' ? 'block' : 'none';
+      document.getElementById('signupSection').style.display = tab==='signup' ? 'block' : 'none';
+      document.getElementById('loginTab').classList.toggle('active', tab==='login');
+      document.getElementById('signupTab').classList.toggle('active', tab==='signup');
+      document.getElementById('loginStatus').innerText='';
+      document.getElementById('signupStatus').innerText='';
     }
-
-    // --- SIGN UP ---
-    function signup() {
-      const email = document.getElementById("signupEmail").value;
-      const password = document.getElementById("signupPassword").value;
-      const role = document.getElementById("signupRole").value;
-
-      auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          return db.collection("users").doc(user.uid).set({
-            email: email,
-            role: role
-          });
-        })
-        .then(() => {
-          document.getElementById("signup-status").innerText = "Account created successfully!";
-        })
-        .catch((error) => {
-          document.getElementById("signup-status").innerText = "Error: " + error.message;
-        });
-    }
-
-    // --- LOGIN ---
-    function login() {
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
-
-      document.getElementById("login-status").innerText = "Logging in...";
-
-      auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          document.getElementById("login-status").innerText = "Login successful!";
-          setTimeout(() => {
-            window.location.href = "dashboard.html"; // make sure dashboard.html exists
-          }, 1200);
-        })
-        .catch((error) => {
-          document.getElementById("login-status").innerText = "Error: " + error.message;
-        });
+    function updateSignupLabel(){
+      const role = document.getElementById('signupRole').value;
+      const label = document.getElementById('nameLabel');
+      label.innerText = role === 'seller' ? 'Enter business name' : (role === 'rider' ? 'Enter rider name' : 'Enter username');
+      document.getElementById('signupName').placeholder = label.innerText;
     }
   </script>
 </body>
