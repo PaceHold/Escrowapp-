@@ -1,37 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <style>
-    body { margin: 0; font-family: 'Arial', sans-serif; background: #0A1F44; color: #fff; }
-    header { background: #112B55; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
-    header h1 { margin: 0; font-size: 24px; color: #1E90FF; }
-    header button { padding: 10px 20px; background: #1E90FF; border: none; border-radius: 8px; cursor: pointer; color: white; font-size: 14px; transition: background 0.3s; }
-    header button:hover { background: #0F74D0; }
-    main { padding: 40px; }
-    .card { background: #112B55; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); margin-bottom: 20px; }
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #001f3f;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #012a63;
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: #ffcc00;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .content {
+      padding: 20px;
+    }
+    .card {
+      background-color: #013b7a;
+      padding: 20px;
+      margin: 10px 0;
+      border-radius: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .logout {
+      float: right;
+      background-color: #ff4d4d;
+    }
   </style>
 </head>
 <body>
+
   <header>
-    <h1>Dashboard</h1>
-    <button onclick="logout()">Logout</button>
+    Dashboard
+    <button class="logout" onclick="logout()">Logout</button>
   </header>
-  <main>
-    <div class="card">
-      <h2 id="welcome">Loading...</h2>
+
+  <div class="content">
+    <h2>Welcome, <span id="user-email"></span></h2>
+    <p>Your role: <strong id="user-role"></strong></p>
+
+    <div id="buyer-section" style="display:none;">
+      <div class="card">
+        <h3>Buyer Dashboard</h3>
+        <p>Here you can view sellers, make requests, and track your purchases.</p>
+      </div>
     </div>
-    <div class="card" id="role-content">
-      <h3>Data</h3>
-      <p>Loading content based on role...</p>
+
+    <div id="seller-section" style="display:none;">
+      <div class="card">
+        <h3>Seller Dashboard</h3>
+        <p>Here you can view buyer requests and manage your offers.</p>
+      </div>
     </div>
-  </main>
+  </div>
 
   <script>
+    // --- Firebase Config ---
     const firebaseConfig = {
       apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
       authDomain: "pacehold-4c7b2.firebaseapp.com",
@@ -41,34 +89,39 @@
       appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
     };
 
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    function getRoleFromURL() {
-      const params = new URLSearchParams(window.location.search);
-      return params.get('role');
-    }
+    // Check user status
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        document.getElementById("user-email").innerText = user.email;
 
-    auth.onAuthStateChanged(user => {
-      if (!user) { window.location.href = "index.html"; return; }
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        if (userDoc.exists) {
+          const role = userDoc.data().role;
+          document.getElementById("user-role").innerText = role;
 
-      db.collection('users').doc(user.uid).get().then(doc => {
-        const role = doc.data().role;
-        document.getElementById('welcome').innerText = `Welcome, ${user.email} (${role})`;
-
-        const roleContent = document.getElementById('role-content');
-        if (role === 'buyer') {
-          roleContent.innerHTML = `<h3>Buyers Panel</h3><p>Here you can view sellers and place orders.</p>`;
-        } else if (role === 'seller') {
-          roleContent.innerHTML = `<h3>Sellers Panel</h3><p>Here you can see buyer requests and manage products.</p>`;
+          if (role === "buyer") {
+            document.getElementById("buyer-section").style.display = "block";
+          } else if (role === "seller") {
+            document.getElementById("seller-section").style.display = "block";
+          }
         }
-      });
+      } else {
+        window.location.href = "index.html";
+      }
     });
 
+    // Logout
     function logout() {
-      auth.signOut().then(() => window.location.href = "index.html");
+      auth.signOut().then(() => {
+        window.location.href = "index.html";
+      });
     }
   </script>
+
 </body>
 </html>
