@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Dashboard</title>
 
-  <!-- Firebase compat libs -->
+  <!-- Firebase compat libs (same style as earlier pages) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -59,7 +59,7 @@
     .tx-row{padding:10px;border-radius:10px;margin-bottom:8px;background:var(--glass)}
     /* rider modal */
     .modal-backdrop{position:fixed;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:2000}
-    .modal{background:var(--card-2);border-radius:12px;padding:16px;width:420px}
+    .modal{background:var(--card-2);border-radius:12px;padding:16px;width:520px}
     .modal h3{margin-top:0}
     .rider-row{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;margin-bottom:8px;background:var(--glass)}
     /* small responsive */
@@ -67,9 +67,11 @@
       .container{flex-direction:column;padding:12px}
       .left{width:100%}
       .chat-panel{right:12px;left:12px;width:auto}
+      .modal{width:90%}
     }
     button.small{padding:8px 10px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer}
     .muted{color:var(--muted)}
+    .label-pill{padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);font-size:12px}
   </style>
 </head>
 <body>
