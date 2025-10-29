@@ -1,87 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login / Sign Up</title>
-
-  <!-- Firebase compat libs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <script type="module" src="dashboard.js" defer></script>
   <style>
-    /* deep-blue fintech look (unchanged from your preference) */
-    :root{--bg:#001f3f;--card:#012a63;--accent:#007bff;--muted:#bbb;}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter, "Poppins", system-ui, Arial;background:var(--bg);color:#fff;display:flex;align-items:center;justify-content:center;height:100vh}
-    .container{width:360px;background:var(--card);border-radius:16px;padding:28px;box-shadow:0 8px 30px rgba(0,0,0,0.45)}
-    .tabs{display:flex;justify-content:center;margin-bottom:12px}
-    .tabs button{background:none;border:none;color:var(--muted);padding:8px 16px;font-weight:600;cursor:pointer;border-radius:8px}
-    .tabs button.active{color:#fff;border-bottom:3px solid var(--accent)}
-    h2{text-align:center;margin:6px 0 18px}
-    input,select{width:100%;padding:10px;border-radius:10px;border:none;margin:8px 0;background:#08355d;color:#fff}
-    button.primary{width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-weight:700;cursor:pointer;margin-top:8px}
-    p.status{height:20px;text-align:center;color:#ffd24d;margin:8px 0 0}
-    label.small{font-size:13px;color:#ddd;margin-top:6px;display:block}
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #021024; /* Dark navy fintech blue */
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #071a35;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #00c6ff;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    input {
+      background-color: #0c254d;
+      color: #fff;
+    }
+
+    button {
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #005fcc;
+    }
+
+    .section {
+      margin-top: 20px;
+      background-color: #0c254d;
+      padding: 15px;
+      border-radius: 15px;
+    }
+
+    .user-box {
+      background-color: #082041;
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 8px;
+    }
+
+    .balance {
+      font-size: 1.2rem;
+      text-align: center;
+      color: #00ffcc;
+    }
+
+    .chat-box {
+      background: #0a1e3f;
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 10px;
+      height: 150px;
+      overflow-y: auto;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .chat-input input {
+      flex: 1;
+    }
+
+    .confirm-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .confirm-buttons button {
+      flex: 1;
+      background-color: #00804b;
+    }
+
+    .confirm-buttons button.pending {
+      background-color: #ffc107;
+      color: #000;
+    }
+
+    .confirm-buttons button.done {
+      background-color: #00c851;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="tabs">
-      <button id="loginTab" class="active" onclick="showTab('login')">Login</button>
-      <button id="signupTab" onclick="showTab('signup')">Sign Up</button>
+    <h1>Dashboard</h1>
+    <div class="balance" id="userBalance">Balance: ₦0.00</div>
+
+    <div id="buyerSection" class="section" style="display:none;">
+      <h2>Search for Seller</h2>
+      <input id="sellerSearchInput" placeholder="Search for seller...">
+      <button onclick="searchUsers('seller', 'sellerSearchInput', 'sellerResults')">Search</button>
+      <div id="sellerResults"></div>
     </div>
 
-    <!-- LOGIN -->
-    <div id="loginSection">
-      <h2>Login</h2>
-      <input id="loginEmail" type="email" placeholder="Email" />
-      <input id="loginPassword" type="password" placeholder="Password" />
-      <select id="loginRole">
-        <option value="buyer">Buyer</option>
-        <option value="seller">Seller</option>
-        <option value="rider">Rider</option>
-      </select>
-      <button class="primary" onclick="login()">Login</button>
-      <p id="loginStatus" class="status"></p>
+    <div id="sellerSection" class="section" style="display:none;">
+      <h2>Find Rider</h2>
+      <input id="riderSearchInput" placeholder="Search for rider...">
+      <button onclick="searchUsers('rider', 'riderSearchInput', 'riderResults')">Search</button>
+      <div id="riderResults"></div>
     </div>
 
-    <!-- SIGNUP -->
-    <div id="signupSection" style="display:none;">
-      <h2>Sign Up</h2>
-      <input id="signupEmail" type="email" placeholder="Email" />
-      <input id="signupPassword" type="password" placeholder="Password" />
-      <select id="signupRole" onchange="updateSignupLabel()">
-        <option value="buyer">Buyer</option>
-        <option value="seller">Seller</option>
-        <option value="rider">Rider</option>
-      </select>
-      <label class="small" id="nameLabel">Enter username</label>
-      <input id="signupName" type="text" placeholder="Username or Business name" />
-      <button class="primary" onclick="signup()">Create account</button>
-      <p id="signupStatus" class="status"></p>
+    <div id="riderSection" class="section" style="display:none;">
+      <h2>Rider Dashboard</h2>
+      <p>Available for deliveries</p>
+    </div>
+
+    <div id="chatSection" class="section" style="display:none;">
+      <h2>Chat</h2>
+      <div id="chatBox" class="chat-box"></div>
+      <div class="chat-input">
+        <input id="chatInput" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+      </div>
+
+      <div id="confirmSection" class="confirm-buttons" style="display:none;">
+        <button id="buyerConfirmBtn" onclick="confirmDelivery('buyer')">Buyer Confirm</button>
+        <button id="riderConfirmBtn" onclick="confirmDelivery('rider')">Rider Confirm</button>
+      </div>
     </div>
   </div>
-
-  <!-- your script file -->
-  <script src="script.js"></script>
-  <script>
-    // small UI helpers
-    function showTab(tab){
-      document.getElementById('loginSection').style.display = tab==='login' ? 'block' : 'none';
-      document.getElementById('signupSection').style.display = tab==='signup' ? 'block' : 'none';
-      document.getElementById('loginTab').classList.toggle('active', tab==='login');
-      document.getElementById('signupTab').classList.toggle('active', tab==='signup');
-      document.getElementById('loginStatus').innerText='';
-      document.getElementById('signupStatus').innerText='';
-    }
-    function updateSignupLabel(){
-      const role = document.getElementById('signupRole').value;
-      const label = document.getElementById('nameLabel');
-      label.innerText = role === 'seller' ? 'Enter business name' : (role === 'rider' ? 'Enter rider name' : 'Enter username');
-      document.getElementById('signupName').placeholder = label.innerText;
-    }
-  </script>
 </body>
 </html>
