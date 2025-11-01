@@ -2,58 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pacehold | Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pacehold Login</title>
   <style>
     body {
       font-family: "Poppins", sans-serif;
-      background-color: #001F3F;
-      color: #fff;
+      background-color: #0a0f2c;
+      color: white;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
       margin: 0;
     }
     .container {
-      width: 360px;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 2rem;
+      background: #10173a;
+      padding: 30px 25px;
       border-radius: 16px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      backdrop-filter: blur(10px);
-      text-align: center;
+      width: 350px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
     }
     h2 {
-      margin-bottom: 1rem;
-      color: #fff;
+      text-align: center;
+      color: #38b6ff;
+      margin-bottom: 25px;
     }
     input, select {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin: 8px 0;
       border: none;
       border-radius: 8px;
-      outline: none;
-      background: rgba(255,255,255,0.1);
+      background: #1a224d;
       color: white;
     }
     button {
       width: 100%;
-      padding: 10px;
-      background: #007BFF;
-      border: none;
+      padding: 12px;
+      background: #38b6ff;
       color: white;
+      border: none;
       border-radius: 8px;
+      font-size: 16px;
       cursor: pointer;
-      margin-top: 10px;
       transition: background 0.3s;
     }
-    button:hover { background: #0056b3; }
+    button:hover {
+      background: #2a9df4;
+    }
     .toggle {
+      text-align: center;
       margin-top: 12px;
-      font-size: 0.9rem;
-      color: #ccc;
+      color: #b5c9ff;
       cursor: pointer;
     }
   </style>
@@ -63,15 +63,96 @@
     <h2 id="formTitle">Login</h2>
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
-    <select id="roleSelect">
+    <input type="text" id="fullName" placeholder="Full Name" style="display: none;" />
+    <select id="role" style="display: none;">
       <option value="buyer">Buyer</option>
       <option value="seller">Seller</option>
       <option value="rider">Rider</option>
     </select>
-    <button id="authButton">Login</button>
-    <div class="toggle" id="toggleText">Don't have an account? Sign Up</div>
+    <button id="loginBtn">Login</button>
+    <p class="toggle" id="toggleForm">Don’t have an account? Sign up</p>
   </div>
 
-  <script type="module" src="index.js"></script>
+  <script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
+      authDomain: "pacehold-4c7b2.firebaseapp.com",
+      projectId: "pacehold-4c7b2",
+      storageBucket: "pacehold-4c7b2.firebasestorage.app",
+      messagingSenderId: "45898843261",
+      appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const formTitle = document.getElementById("formTitle");
+    const loginBtn = document.getElementById("loginBtn");
+    const toggleForm = document.getElementById("toggleForm");
+    const fullName = document.getElementById("fullName");
+    const roleSelect = document.getElementById("role");
+
+    let isLogin = true;
+
+    toggleForm.addEventListener("click", () => {
+      isLogin = !isLogin;
+      if (isLogin) {
+        formTitle.innerText = "Login";
+        loginBtn.innerText = "Login";
+        fullName.style.display = "none";
+        roleSelect.style.display = "none";
+        toggleForm.innerText = "Don’t have an account? Sign up";
+      } else {
+        formTitle.innerText = "Sign Up";
+        loginBtn.innerText = "Create Account";
+        fullName.style.display = "block";
+        roleSelect.style.display = "block";
+        toggleForm.innerText = "Already have an account? Login";
+      }
+    });
+
+    loginBtn.addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const name = fullName.value.trim();
+      const role = roleSelect.value;
+
+      if (isLogin) {
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          window.location.href = "dashboard.html";
+        } catch (err) {
+          alert("Login failed: " + err.message);
+        }
+      } else {
+        if (!name) return alert("Please enter your full name");
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+          await updateProfile(user, { displayName: name });
+          await setDoc(doc(db, "users", user.uid), { name, email, role, balance: 0 });
+          alert("Account created successfully!");
+          window.location.href = "dashboard.html";
+        } catch (err) {
+          alert("Signup failed: " + err.message);
+        }
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if (window.location.pathname.includes("index.html")) {
+          window.location.href = "dashboard.html";
+        }
+      }
+    });
+  </script>
 </body>
 </html>
