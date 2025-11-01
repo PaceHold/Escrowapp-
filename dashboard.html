@@ -1,151 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard</title>
-
-  <!-- Firebase compat libs (same style as earlier pages) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pacehold Dashboard</title>
   <style>
-    :root{
-      --bg: #001F3F; /* dark navy fintech blue */
-      --card: #012a63;
-      --card-2: #013b7a;
-      --accent: #1E90FF;
-      --muted: #adb7c9;
-      --glass: rgba(255,255,255,0.03);
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background-color: #0a0f2c;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter, "Poppins", system-ui, Arial;background:var(--bg);color:#fff}
-    header{background:var(--card);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
-    header h1{margin:0;color:var(--accent);font-size:20px}
-    header .small{font-size:14px;color:var(--muted)}
-    .container{display:flex;gap:18px;padding:18px}
-    .left{width:340px}
-    .right{flex:1}
-    .card{background:var(--card-2);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.35)}
-    .search{display:flex;gap:8px;margin-bottom:12px}
-    .search input{flex:1;padding:10px;border-radius:8px;border:none;background:#08355d;color:#fff}
-    .user-list{margin-top:8px;max-height:62vh;overflow:auto}
-    .user-row{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;margin-bottom:8px;background:var(--glass);cursor:pointer}
-    .user-row:hover{background:rgba(255,255,255,0.04)}
-    .user-name{font-weight:600}
-    .badge-new{background:#ff4d4d;color:#fff;padding:6px 8px;border-radius:999px;font-size:13px}
-    .welcome{margin-bottom:12px}
-    /* Floating chat icon */
-    .chat-fab{position:fixed;right:20px;bottom:20px;background:var(--accent);width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 26px rgba(0,0,0,0.4);cursor:pointer}
-    .chat-fab .bell{font-size:22px}
-    .chat-badge{position:absolute;top:6px;right:6px;background:#ff3b30;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
-    /* Chat panel */
-    .chat-panel{position:fixed;right:20px;bottom:90px;width:380px;height:460px;background:var(--card-2);border-radius:12px;box-shadow:0 20px 40px rgba(0,0,0,0.5);display:flex;flex-direction:column;overflow:hidden}
-    .chat-header{padding:12px;border-bottom:1px solid rgba(255,255,255,0.03);display:flex;justify-content:space-between;align-items:center}
-    .chat-body{flex:1;padding:12px;overflow:auto}
-    .msg{padding:8px 12px;border-radius:12px;margin:8px 0;max-width:75%;}
-    .msg.me{background:var(--accent);color:#fff;margin-left:auto}
-    .msg.them{background:rgba(255,255,255,0.06);color:#fff;margin-right:auto}
-    .chat-input{display:flex;padding:12px;border-top:1px solid rgba(255,255,255,0.03);gap:8px}
-    .chat-input input{flex:1;padding:10px;border-radius:8px;border:none;background:#093a66;color:#fff}
-    .chat-input button{padding:10px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer}
-    /* fintech boxes */
-    .boxes{display:flex;gap:12px;margin-top:12px}
-    .box{flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px}
-    .box .label{font-size:13px;color:#9fb2d9}
-    .box .amount{font-weight:800;font-size:18px;margin-top:6px}
-    .tx-list{margin-top:12px}
-    .tx-row{padding:10px;border-radius:10px;margin-bottom:8px;background:var(--glass)}
-    /* rider modal */
-    .modal-backdrop{position:fixed;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:2000}
-    .modal{background:var(--card-2);border-radius:12px;padding:16px;width:520px}
-    .modal h3{margin-top:0}
-    .rider-row{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;margin-bottom:8px;background:var(--glass)}
-    /* small responsive */
-    @media(max-width:900px){
-      .container{flex-direction:column;padding:12px}
-      .left{width:100%}
-      .chat-panel{right:12px;left:12px;width:auto}
-      .modal{width:90%}
+    header {
+      background-color: #10173a;
+      padding: 15px;
+      text-align: center;
+      color: #38b6ff;
+      font-size: 22px;
+      font-weight: 600;
     }
-    button.small{padding:8px 10px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer}
-    .muted{color:var(--muted)}
-    .label-pill{padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02);font-size:12px}
+    nav {
+      display: flex;
+      justify-content: space-around;
+      background-color: #111b42;
+      padding: 10px;
+    }
+    nav button {
+      background: none;
+      border: none;
+      color: #b5c9ff;
+      font-size: 15px;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    nav button.active, nav button:hover {
+      color: #38b6ff;
+    }
+    section {
+      flex-grow: 1;
+      padding: 20px;
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+    .card {
+      background: #16204a;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    .balance {
+      font-size: 22px;
+      color: #38b6ff;
+      font-weight: bold;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #1b2755;
+      color: white;
+    }
+    button.action {
+      background-color: #38b6ff;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    button.action:hover {
+      background-color: #2a9df4;
+    }
+    #chatBox {
+      height: 200px;
+      overflow-y: auto;
+      background: #111b42;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .message {
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 8px;
+      background: #1a2555;
+    }
+    .message.you {
+      background: #38b6ff;
+      color: #000;
+      text-align: right;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>PaceHold Dashboard</h1>
-    <div>
-      <span id="topUser" class="small">Loading...</span>
-      <button id="logoutBtn" class="small" style="margin-left:12px;background:#ff4d4d">Logout</button>
+  <header>Pacehold Dashboard</header>
+  <nav>
+    <button class="active" data-tab="overview">Overview</button>
+    <button data-tab="search">Search</button>
+    <button data-tab="chat">Chat</button>
+    <button data-tab="escrow">Escrow</button>
+    <button id="logoutBtn">Logout</button>
+  </nav>
+
+  <section id="overview" class="active">
+    <div class="card">
+      <p id="welcomeText"></p>
+      <p class="balance">Balance: ₦<span id="balanceAmount">0.00</span></p>
     </div>
-  </header>
+  </section>
 
-  <div class="container">
-    <div class="left">
-      <div class="card">
-        <div class="welcome">
-          <h3 id="welcomeName">Welcome</h3>
-          <div class="small muted" id="roleLabel">Role: -</div>
-        </div>
-
-        <div style="margin-top:8px">
-          <div id="roleInstruction" class="muted" style="margin-bottom:8px">Instruction: Search users</div>
-          <div class="search">
-            <input id="searchInput" type="text" placeholder="Search by name or email..." />
-            <button onclick="refreshList()" title="Refresh">⟳</button>
-          </div>
-
-          <div class="user-list card" id="userList">
-            <!-- users loaded here -->
-            <div style="color:#bbb;text-align:center;padding:10px">Loading list…</div>
-          </div>
-        </div>
-      </div>
+  <section id="search">
+    <div class="card">
+      <p id="searchInstruction"></p>
+      <input type="text" id="searchInput" placeholder="Search by name..." />
+      <button class="action" id="searchBtn">Search</button>
+      <div id="searchResults"></div>
     </div>
+  </section>
 
-    <div class="right">
-      <div class="card">
-        <h3>Active Chat</h3>
-        <div id="activeChatInfo" style="margin:12px 0;color:#ddd">Select a user to start chatting</div>
-
-        <!-- fintech boxes injected by script -->
-        <!-- transactions list injected by script -->
-      </div>
+  <section id="chat">
+    <div class="card">
+      <div id="chatBox"></div>
+      <textarea id="messageInput" placeholder="Type message..."></textarea>
+      <button class="action" id="sendMsgBtn">Send</button>
     </div>
-  </div>
+  </section>
 
-  <!-- Floating chat button -->
-  <div class="chat-fab" id="chatFab" onclick="toggleChatPanel()">
-    <div style="position:relative">
-      <div class="bell">💬</div>
-      <div id="chatBadge" class="chat-badge" style="display:none">1</div>
+  <section id="escrow">
+    <div class="card">
+      <h3>Escrow Transactions</h3>
+      <div id="escrowList">No active transactions yet.</div>
+      <button class="action" id="confirmBtn" style="display:none;">Confirm Delivery</button>
     </div>
-  </div>
+  </section>
 
-  <!-- Chat panel (hidden by default) -->
-  <div id="chatPanel" class="chat-panel" style="display:none">
-    <div class="chat-header">
-      <div>
-        <div id="chatWith" style="font-weight:700">Chat</div>
-        <div id="chatWithSub" style="font-size:12px;color:#ccc">Private conversation</div>
-      </div>
-      <div>
-        <button onclick="closeChatPanel()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:16px">✕</button>
-      </div>
-    </div>
-    <div id="chatBody" class="chat-body"></div>
-    <div class="chat-input">
-      <input id="messageInput" placeholder="Write a message..." />
-      <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-
-  <!-- Rider selection modal -->
-  <div id="riderModal" style="display:none"></div>
-
-  <script src="dashboard.js"></script>
+  <script type="module" src="dashboard.js"></script>
 </body>
 </html>
