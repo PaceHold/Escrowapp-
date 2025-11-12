@@ -1,77 +1,57 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { 
-  getFirestore, 
-  doc, 
-  setDoc, 
-  getDoc 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// index.js
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.getElementById('login-form');
+  const signupLink = document.getElementById('signup-link');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const nameInput = document.getElementById('name'); // Optional name field
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAvfyYoeooY5bx1Z-SGdcEWA-G_zGFY5B8",
-  authDomain: "pacehold-4c7b2.firebaseapp.com",
-  projectId: "pacehold-4c7b2",
-  storageBucket: "pacehold-4c7b2.firebasestorage.app",
-  messagingSenderId: "45898843261",
-  appId: "1:45898843261:web:4df9b7cb59dd5a1c699d14"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-// Form references
-const authButton = document.getElementById("authButton");
-const toggleText = document.getElementById("toggleText");
-const formTitle = document.getElementById("formTitle");
-
-let isLogin = true;
-
-toggleText.addEventListener("click", () => {
-  isLogin = !isLogin;
-  formTitle.innerText = isLogin ? "Login" : "Sign Up";
-  authButton.innerText = isLogin ? "Login" : "Sign Up";
-  toggleText.innerText = isLogin
-    ? "Don't have an account? Sign Up"
-    : "Already have an account? Login";
-});
-
-authButton.addEventListener("click", async () => {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const role = document.getElementById("roleSelect").value;
-
-  try {
-    if (isLogin) {
-      await signInWithEmailAndPassword(auth, email, password);
-    } else {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      await setDoc(doc(db, "users", user.uid), {
-        email,
-        role,
-        balance: 0,
-        createdAt: new Date().toISOString(),
-      });
-      alert("Account created successfully!");
-    }
-  } catch (error) {
-    alert(error.message);
+  // Check if a session exists already
+  const userSession = JSON.parse(localStorage.getItem('pacehold_user'));
+  if (userSession && userSession.role) {
+    redirectToDashboard(userSession.role);
   }
-});
 
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-    if (userSnap.exists()) {
-      window.location.href = "dashboard.html";
-    }
+  // Handle login
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!email || !password) {
+        alert('Please fill all fields');
+        return;
+      }
+
+      const storedUser = JSON.parse(localStorage.getItem(email));
+
+      if (!storedUser || storedUser.password !== password) {
+        alert('Invalid email or password');
+        return;
+      }
+
+      // Save session
+      localStorage.setItem(
+        'pacehold_user',
+        JSON.stringify({ email, role: storedUser.role, name: storedUser.name })
+      );
+
+      redirectToDashboard(storedUser.role);
+    });
+  }
+
+  // Handle signup link
+  if (signupLink) {
+    signupLink.addEventListener('click', () => {
+      window.location.href = 'signup.html';
+    });
+  }
+
+  function redirectToDashboard(role) {
+    if (role === 'buyer') window.location.href = 'buyer.html';
+    else if (role === 'seller') window.location.href = 'seller.html';
+    else if (role === 'rider') window.location.href = 'rider.html';
+    else window.location.href = 'dashboard.html';
   }
 });
