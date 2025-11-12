@@ -1,45 +1,46 @@
 // dashboard.js
-document.addEventListener('DOMContentLoaded', () => {
-  const userSession = JSON.parse(localStorage.getItem('pacehold_user'));
-  const logoutBtn = document.getElementById('logout-btn');
-  const roleSpan = document.getElementById('role-span');
-  const searchInput = document.getElementById('search-input');
-  const searchResults = document.getElementById('search-results');
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById("logout-btn");
+  const roleSpan = document.getElementById("role-span");
+  const searchInput = document.getElementById("search-input");
+  const searchResults = document.getElementById("search-results");
 
-  // Check if logged in
+  const userSession = JSON.parse(localStorage.getItem("pacehold_user"));
+  const currentPage = window.location.pathname.split("/").pop();
+
+  // ⛔ Only redirect if the user is NOT logged in
   if (!userSession) {
-    window.location.href = 'index.html';
+    if (currentPage !== "index.html") {
+      window.location.href = "index.html";
+    }
     return;
   }
 
-  // Display user info
-  if (roleSpan) {
-    roleSpan.textContent = userSession.role || '-';
-  }
+  if (roleSpan) roleSpan.textContent = userSession.role || "-";
 
-  // Logout
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem('pacehold_user');
-      window.location.href = 'index.html';
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("pacehold_user");
+      window.location.href = "index.html";
     });
   }
 
-  // Dummy search feature (replace with actual backend later)
+  // 🧠 Search simulation
   if (searchInput) {
-    searchInput.addEventListener('input', () => {
+    searchInput.addEventListener("input", () => {
       const query = searchInput.value.toLowerCase();
       if (!query) {
-        searchResults.innerHTML = '';
+        searchResults.innerHTML = "";
         return;
       }
 
-      const sampleUsers = ['alice@pacehold.com', 'bob@pacehold.com', 'charlie@pacehold.com'];
-      const matches = sampleUsers.filter(user => user.includes(query));
+      const users = ["alice@pacehold.com", "bob@pacehold.com", "charlie@pacehold.com"];
+      const results = users.filter((u) => u.includes(query));
 
-      searchResults.innerHTML = matches.length
-        ? matches.map(m => `<div class="result-item">${m}</div>`).join('')
-        : '<div class="result-item">No results</div>';
+      searchResults.innerHTML =
+        results.length > 0
+          ? results.map((r) => `<div class="result-item">${r}</div>`).join("")
+          : `<div class="result-item">No results found</div>`;
     });
   }
 });
