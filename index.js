@@ -1,70 +1,101 @@
-// index.js
-document.addEventListener("DOMContentLoaded", () => {
-  const loginForm = document.getElementById("login-form");
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
+// index.js  — login/signup/session handling
 
-  // 🔒 Prevent redirect loop by checking ONLY once and waiting for DOM to be ready
-  const userSession = JSON.parse(localStorage.getItem("pacehold_user"));
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-  // Redirect ONLY if we're not already on dashboard pages
-  const currentPage = window.location.pathname.split("/").pop();
+// ✅ Your Firebase Config here
+const firebaseConfig = {
+  apiKey: "YOUR_FIREBASE_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
+};
 
-  if (
-    userSession &&
-    userSession.role &&
-    !["buyer.html", "seller.html", "rider.html", "dashboard.html"].includes(
-      currentPage
-    )
-  ) {
-    redirectToDashboard(userSession.role);
-    return;
-  }
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-  if (loginForm) {
-    loginForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
+// -------- DOM ----------
+const signupForm = document.getElementById("signupForm");
+const loginForm = document.getElementById("loginForm");
+const logoutBtn = document.getElementById("logoutBtn");
+const roleSelect = document.getElementById("roleSelect");
 
-      if (!email || !password) {
-        alert("Please fill all fields");
-        return;
-      }
-
-      const storedUser = JSON.parse(localStorage.getItem(email));
-      if (!storedUser || storedUser.password !== password) {
-        alert("Invalid email or password");
-        return;
-      }
-
-      // Save active session
-      localStorage.setItem(
-        "pacehold_user",
-        JSON.stringify({
-          email,
-          role: storedUser.role,
-          name: storedUser.name,
-        })
-      );
-
-      redirectToDashboard(storedUser.role);
-    });
-  }
-
-  function redirectToDashboard(role) {
-    switch (role) {
-      case "buyer":
-        window.location.href = "buyer.html";
-        break;
-      case "seller":
-        window.location.href = "seller.html";
-        break;
-      case "rider":
-        window.location.href = "rider.html";
-        break;
-      default:
-        window.location.href = "dashboard.html";
+// -------- Session Guard ----------
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const stored = sessionStorage.getItem("pacehold_user");
+    if (!stored) {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const data = userDoc.exists() ? userDoc.data() : {};
+      sessionStorage.setItem("pacehold_user", JSON.stringify({
+        uid: user.uid,
+        name: data.name || user.displayName || "",
+        role: data.role || "buyer"
+      }));
+    }
+    if (!window.location.href.includes("dashboard.html")) {
+      window.location.href = "dashboard.html";
+    }
+  } else {
+    sessionStorage.removeItem("pacehold_user");
+    if (window.location.href.includes("dashboard.html")) {
+      window.location.href = "index.html";
     }
   }
 });
+
+// -------- Signup ----------
+if (signupForm) {
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = signupForm["name"].value.trim();
+    const email = signupForm["email"].value.trim();
+    const password = signupForm["password"].value.trim();
+    const role = roleSelect.value;
+
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(cred.user, { displayName: name });
+      await setDoc(doc(db, "users", cred.user.uid), { name, email, role, uid: cred.user.uid });
+      sessionStorage.setItem("pacehold_user", JSON.stringify({ uid: cred.user.uid, name, role }));
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+}
+
+// -------- Login ----------
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = loginForm["email"].value.trim();
+    const password = loginForm["password"].value.trim();
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const userDoc = await getDoc(doc(db, "users", cred.user.uid));
+      const data = userDoc.exists() ? userDoc.data() : {};
+      sessionStorage.setItem("pacehold_user", JSON.stringify({
+        uid: cred.user.uid,
+        name: data.name || cred.user.displayName || "",
+        role: data.role || "buyer"
+      }));
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+}
+
+// -------- Logout ----------
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    sessionStorage.clear();
+    window.location.href = "index.html";
+  });
+}
