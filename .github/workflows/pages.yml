@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages  # Use lowercase 'name' (Best practice)
 
 on:
   push:
@@ -20,10 +20,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Setup Pages
+        # Use v4 if you are on a free account, or v5 if you are sure it works.
+        # I'll keep v5 as you had it, but v4 is the current standard.
         uses: actions/configure-pages@v5
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
+          # IMPORTANT NOTE on 'path: .':
+          # The path: '.' uploads the ENTIRE repository root.
+          # If you have a separate build step, you should point this to your
+          # build output directory (e.g., path: 'dist' or path: '_site').
+          # If your site is only static files in the root, this is okay.
           path: '.'
 
   deploy:
