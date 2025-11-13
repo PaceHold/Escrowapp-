@@ -1,46 +1,71 @@
 // dashboard.js
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_FIREBASE_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// -------- Session Check ----------
+const sessionUser = JSON.parse(sessionStorage.getItem("pacehold_user"));
+if (!sessionUser) {
+  window.location.href = "index.html";
+}
+
+// -------- Display User ----------
 document.addEventListener("DOMContentLoaded", () => {
-  const logoutBtn = document.getElementById("logout-btn");
-  const roleSpan = document.getElementById("role-span");
-  const searchInput = document.getElementById("search-input");
-  const searchResults = document.getElementById("search-results");
-
-  const userSession = JSON.parse(localStorage.getItem("pacehold_user"));
-  const currentPage = window.location.pathname.split("/").pop();
-
-  // ⛔ Only redirect if the user is NOT logged in
-  if (!userSession) {
-    if (currentPage !== "index.html") {
-      window.location.href = "index.html";
-    }
-    return;
-  }
-
-  if (roleSpan) roleSpan.textContent = userSession.role || "-";
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("pacehold_user");
-      window.location.href = "index.html";
-    });
-  }
-
-  // 🧠 Search simulation
-  if (searchInput) {
-    searchInput.addEventListener("input", () => {
-      const query = searchInput.value.toLowerCase();
-      if (!query) {
-        searchResults.innerHTML = "";
-        return;
-      }
-
-      const users = ["alice@pacehold.com", "bob@pacehold.com", "charlie@pacehold.com"];
-      const results = users.filter((u) => u.includes(query));
-
-      searchResults.innerHTML =
-        results.length > 0
-          ? results.map((r) => `<div class="result-item">${r}</div>`).join("")
-          : `<div class="result-item">No results found</div>`;
-    });
+  const userBox = document.getElementById("userBox");
+  if (userBox) {
+    userBox.textContent = `Welcome, ${sessionUser.name} (${sessionUser.role})`;
   }
 });
+
+// -------- Search Users ----------
+async function searchUsers() {
+  const input = document.getElementById("searchInput").value.trim().toLowerCase();
+  const resultBox = document.getElementById("resultBox");
+  resultBox.innerHTML = "Searching...";
+  let q;
+
+  if (sessionUser.role === "buyer") {
+    q = query(collection(db, "users"), where("role", "==", "seller"));
+  } else if (sessionUser.role === "seller") {
+    q = query(collection(db, "users"), where("role", "==", "buyer"));
+  } else if (sessionUser.role === "rider") {
+    q = query(collection(db, "users"), where("role", "in", ["buyer", "seller"]));
+  }
+
+  const snapshot = await getDocs(q);
+  const matches = [];
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+    if (data.name.toLowerCase().includes(input)) {
+      matches.push(data);
+    }
+  });
+
+  if (matches.length === 0) {
+    resultBox.innerHTML = "<p>No users found.</p>";
+  } else {
+    resultBox.innerHTML = matches
+      .map(
+        (u) =>
+          `<div class="user-result">
+            <strong>${u.name}</strong> — ${u.role}
+          </div>`
+      )
+      .join("");
+  }
+}
+
+const searchBtn = document.getElementById("searchBtn");
+if (searchBtn) searchBtn.addEventListener("click", searchUsers);
